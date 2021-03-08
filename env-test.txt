@@ -1,4 +1,4 @@
 TOKEN=
 logs =
-
+mongo =
 # create .env with it and put these as env variables :)

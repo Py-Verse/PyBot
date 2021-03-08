@@ -33,7 +33,7 @@ Commands related to cog
 admins = [747451011484090479, 727365670395838626]
 
 
-@bot.command(description="Load cog")
+@bot.command(hidden=True, description="Load cog")
 async def load(self, ctx, extension):
     """
     Load cog
@@ -43,7 +43,7 @@ async def load(self, ctx, extension):
         await ctx.send("Done")
 
 
-@bot.command(description="Unload cog")
+@bot.command(hidden=True, description="Unload cog")
 async def unload(self, ctx, extension):
     """
     Unload Cog
@@ -53,7 +53,7 @@ async def unload(self, ctx, extension):
         await ctx.send("Done")
 
 
-@bot.command(description="Reload cog")
+@bot.command(hidden=True, description="Reload cog")
 async def reload(self, ctx, extension):
     """
     Reload Cog

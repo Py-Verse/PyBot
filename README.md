@@ -10,6 +10,7 @@ PyBot - A Bot for PyVerse Server which is now open source for it's community!
 ```bash
 TOKEN=token_here
 logs = url_here
+mongo = url_here
 ```
 
 # Contributing Guidelines

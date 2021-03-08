@@ -68,6 +68,9 @@ class Level(commands.Cog):
 
     @commands.command(aliases=["xp", "r"])
     async def rank(self, ctx, member: discord.Member = None):
+        """
+        Shows the rank of mentioned user / yours
+        """
         if member is None:
             member = ctx.author
         else:
@@ -116,6 +119,9 @@ class Level(commands.Cog):
         aliases=["db", "leaderboard", "lb"], description="Shows server leaderboard"
     )
     async def dashboard(self, ctx):
+        """
+        Shows the members with highest xp
+        """
         rankings = levelling.find().sort("xp", -1)
         i = 1
         embed = discord.Embed(
