@@ -28,6 +28,43 @@ async def on_ready():
 
 
 """
+Commands related to cog
+"""
+admins = [747451011484090479, 727365670395838626]
+
+
+@bot.command(description="Load cog")
+async def load(self, ctx, extension):
+    """
+    Load cog
+    """
+    if ctx.author.id not in admins:
+        bot.load_extension(f"cogs.{extension}")
+        await ctx.send("Done")
+
+
+@bot.command(description="Unload cog")
+async def unload(self, ctx, extension):
+    """
+    Unload Cog
+    """
+    if ctx.author.id not in admins:
+        bot.unload_extension(f"cogs.{extension}")
+        await ctx.send("Done")
+
+
+@bot.command(description="Reload cog")
+async def reload(self, ctx, extension):
+    """
+    Reload Cog
+    """
+    if ctx.author.id not in admins:
+        bot.unload_extension(f"cogs.{extension}")
+        bot.load_extension(f"cogs.{extension}")
+        await ctx.send("Done")
+
+
+"""
 Loads cog
 """
 for filename in os.listdir("./cogs"):

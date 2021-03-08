@@ -64,7 +64,7 @@ class BotSource(commands.Cog):
             embed = Embed(title="Bot's GitHub Repository", color=0x00FFCC)
             embed.add_field(
                 name="Repository",
-                value="[Go to GitHub](https://github.com/AyushSehrawat/leafy-bot/)",
+                value="[Go to GitHub](https://github.com/Py-Verse/PyBot)",
             )
             embed.set_thumbnail(url="https://avatars1.githubusercontent.com/u/9919")
             await ctx.send(embed=embed)
@@ -114,7 +114,7 @@ class BotSource(commands.Cog):
         else:
             file_location = Path(filename).relative_to(Path.cwd()).as_posix()
 
-        url = f"https://github.com/AyushSehrawat/leafy-bot/blob/master/{file_location}{lines_extension}"
+        url = f"https://github.com/Py-Verse/PyBot/blob/master/{file_location}{lines_extension}"
 
         return url, file_location, first_line_no or None
 
