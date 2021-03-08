@@ -60,9 +60,10 @@ class Level(commands.Cog):
                         try:
                             for i in range(len(level)):
                                 if lvl == levelnum[i]:
-                                    role = message.guild.get_role(id=level[i])
+                                    role = message.guild.get_role(level[i])
                                     await message.author.add_roles(role)
-                        except Exception:
+                        except Exception as e:
+                            # print(e)
                             pass
 
     @commands.command(aliases=["xp", "r"])
@@ -102,13 +103,13 @@ class Level(commands.Cog):
                 title=f"{ctx.author.name}'s Level stats",
                 color=0xFF0000,
             )
-            embed.add_field(name="Name", value=f"{ctx.author.mention}", inline=True)
+            embed.add_field(name="Name", value=f"{member.mention}", inline=True)
             embed.add_field(
                 name="XP", value=f"{xp}/{int(200* ((1/2)*lvl))}", inline=True
             )
             embed.add_field(name="Global Rank", value=f"{rank}", inline=True)
             embed.add_field(name="Level", value=f"{lvl}", inline=True)
-            embed.set_thumbnail(url=ctx.author.avatar_url)
+            embed.set_thumbnail(url=member.avatar_url)
             await ctx.channel.send(embed=embed)
 
     @commands.command(
