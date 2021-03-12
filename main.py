@@ -34,7 +34,7 @@ admins = [747451011484090479, 727365670395838626]
 
 
 @bot.command(hidden=True, description="Load cog")
-async def load(self, ctx, extension):
+async def load(ctx, extension):
     """
     Load cog
     """
@@ -44,7 +44,7 @@ async def load(self, ctx, extension):
 
 
 @bot.command(hidden=True, description="Unload cog")
-async def unload(self, ctx, extension):
+async def unload(ctx, extension):
     """
     Unload Cog
     """
@@ -54,7 +54,7 @@ async def unload(self, ctx, extension):
 
 
 @bot.command(hidden=True, description="Reload cog")
-async def reload(self, ctx, extension):
+async def reload(ctx, extension):
     """
     Reload Cog
     """
@@ -62,6 +62,24 @@ async def reload(self, ctx, extension):
         bot.unload_extension(f"cogs.{extension}")
         bot.load_extension(f"cogs.{extension}")
         await ctx.send("Done")
+
+
+@bot.command(hidden=True)
+@commands.is_owner()
+async def wsend(ctx):
+    """
+    Use to send embeds for reaction Roles
+    """
+    e = discord.Embed(color=0x7289DA)
+    e.add_field(
+        name="Reaction Roles\n\n",
+        value="**Operating System:**\n\n"
+        "<:windows:819940534751199252> Windows\n\n"
+        "<:linux:819940542283644988> Linux\n\n"
+        "**Notification Roles:**\n\n"
+        "<:announcement:819958031047196692> Announcement",
+    )
+    await ctx.send(embed=e)
 
 
 """
