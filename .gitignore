@@ -2,6 +2,7 @@ poetry.lock
 pyproject.toml
 # Byte-compiled / optimized / DLL files
 __pycache__/
+ms.py
 *.py[cod]
 *$py.class
 pyproject.toml
