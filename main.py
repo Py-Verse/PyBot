@@ -77,9 +77,14 @@ async def wsend(ctx):
         "<:windows:819940534751199252> Windows\n\n"
         "<:linux:819940542283644988> Linux\n\n"
         "**Notification Roles:**\n\n"
-        "<:announcement:819958031047196692> Announcement",
+        "<:announcement:819958031047196692> Announcement\n\n"
+        "<:chat_revive:820145356209389590> Chat Revive",
     )
-    await ctx.send(embed=e)
+    msg = await ctx.send(embed=e)
+    await msg.add_reaction(f"<:windows:819940534751199252>")
+    await msg.add_reaction(f"<:linux:819940542283644988>")
+    await msg.add_reaction(f"<:announcement:819958031047196692>")
+    await msg.add_reaction(f"<:chat_revive:820145356209389590>")
 
 
 """

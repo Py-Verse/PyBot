@@ -19,19 +19,49 @@ class ReactionRoles(commands.Cog):
 
     @commands.Cog.listener()
     async def on_raw_reaction_add(self, payload):
-        if payload.message_id == 819960026155581490:
+        if payload.message_id == 820146699002576917:
             guild = self.bot.get_guild(payload.guild_id)
             user = await guild.fetch_member(payload.user_id)
             emoji_id = payload.emoji.id
+
             if emoji_id == 819940534751199252:
                 role = guild.get_role(819939970869231666)
                 await user.add_roles(role)
+
             elif emoji_id == 819940542283644988:
                 role = guild.get_role(819940076090949642)
                 await user.add_roles(role)
+
             elif emoji_id == 819958031047196692:
                 role = guild.get_role(819770725170675722)
                 await user.add_roles(role)
+
+            elif emoji_id == 820145356209389590:
+                role = guild.get_role(820127343901278219)
+                await user.add_roles(role)
+
+    @commands.Cog.listener()
+    async def on_raw_reaction_remove(self, payload):
+        if payload.message_id == 820146699002576917:
+            guild = self.bot.get_guild(payload.guild_id)
+            user = await guild.fetch_member(payload.user_id)
+            emoji_id = payload.emoji.id
+
+            if emoji_id == 819940534751199252:
+                role = guild.get_role(819939970869231666)
+                await user.remove_roles(role)
+
+            elif emoji_id == 819940542283644988:
+                role = guild.get_role(819940076090949642)
+                await user.remove_roles(role)
+
+            elif emoji_id == 819958031047196692:
+                role = guild.get_role(819770725170675722)
+                await user.remove_roles(role)
+
+            elif emoji_id == 820145356209389590:
+                role = guild.get_role(820127343901278219)
+                await user.remove_roles(role)
 
 
 def setup(bot):
