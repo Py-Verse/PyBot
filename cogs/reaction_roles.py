@@ -19,12 +19,17 @@ class ReactionRoles(commands.Cog):
 
     @commands.Cog.listener()
     async def on_raw_reaction_add(self, payload):
-        if payload.message_id == 820167136461979668:
+        if payload.message_id in [820236163960668210, 820236203726077992]:
             guild = self.bot.get_guild(payload.guild_id)
             user = await guild.fetch_member(payload.user_id)
             emoji_id = payload.emoji.id
 
-            if emoji_id == 819940534751199252:
+            if emoji_id == 820156388130160670:
+                # verification - 813668832047661076 -> role id
+                role = guild.get_role(813668832047661076)
+                await user.add_roles(role)
+
+            elif emoji_id == 819940534751199252:
                 # Windows - 819939970869231666 -> role id
                 role = guild.get_role(819939970869231666)
                 await user.add_roles(role)
@@ -46,7 +51,7 @@ class ReactionRoles(commands.Cog):
 
     @commands.Cog.listener()
     async def on_raw_reaction_remove(self, payload):
-        if payload.message_id == 820167136461979668:
+        if payload.message_id in [820236163960668210, 820236203726077992]:
             guild = self.bot.get_guild(payload.guild_id)
             user = await guild.fetch_member(payload.user_id)
             emoji_id = payload.emoji.id

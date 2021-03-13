@@ -87,6 +87,20 @@ async def wsend(ctx):
     await msg.add_reaction(f"<:chat_revive:820145356209389590>")
 
 
+# Verification embed
+@bot.command(hidden=True)
+@commands.is_owner()
+async def wsend2(ctx):
+    e = discord.Embed(color=0x7289DA)
+    e.add_field(
+        name="Welcome to PyVerse",
+        value="Before getting started please react with <:yes:820156388130160670> "
+        "to get access to rest of the channels",
+    )
+    msg = await ctx.send(embed=e)
+    await msg.add_reaction(f"<:yes:820156388130160670>")
+
+
 """
 Loads cog
 """
