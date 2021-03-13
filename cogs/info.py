@@ -1,12 +1,17 @@
 import difflib
+import inspect
 import logging
+import os
 import re
 import socket
 import unicodedata
 from datetime import datetime
-from typing import Tuple, Union
+from pathlib import Path
+from typing import Optional, Tuple, Union
 
 import discord
+import motor.motor_asyncio
+import nest_asyncio
 import requests
 from discord import Colour, Embed, utils
 from discord.ext import commands
@@ -24,6 +29,22 @@ from discord.utils import snowflake_time
 
 from utils.messages import send_denial
 from utils.paginator import LinePaginator
+
+nest_asyncio.apply()
+
+mongo_url = os.environ.get("mongo")
+
+cluster = motor.motor_asyncio.AsyncIOMotorClient(mongo_url)
+levelling = cluster["discord"]["levelling"]
+
+SourceType = Union[
+    commands.HelpCommand,
+    commands.Command,
+    commands.Cog,
+    str,
+    commands.ExtensionNotLoaded,
+]
+
 
 DESCRIPTIONS = ("Command processing time", "Discord API latency")
 ROUND_LATENCY = 3
@@ -52,6 +73,37 @@ If the implementation is hard to explain, it's a bad idea.
 If the implementation is easy to explain, it may be a good idea.
 Namespaces are one honking great idea -- let's do more of those!
 """
+
+
+class SourceConverter(commands.Converter):
+    """Convert an argument into a help command, tag, command, or cog."""
+
+    async def convert(self, ctx: commands.Context, argument: str) -> SourceType:
+        """Convert argument into source object."""
+        if argument.lower().startswith("help"):
+            return
+
+        cog = ctx.bot.get_cog(argument)
+        if cog:
+            return cog
+
+        cmd = ctx.bot.get_command(argument)
+        if cmd:
+            return cmd
+
+        tags_cog = ctx.bot.get_cog("Tags")
+        show_tag = True
+
+        if not tags_cog:
+            show_tag = False
+        elif argument.lower() in tags_cog._cache:
+            return argument.lower()
+
+        escaped_arg = utils.escape_markdown(argument)
+
+        raise commands.BadArgument(
+            f"Unable to convert '{escaped_arg}' to valid command{', tag,' if show_tag else ''} or Cog."
+        )
 
 
 class Info(commands.Cog):
@@ -215,6 +267,178 @@ class Info(commands.Cog):
         embed.title += f" (line {match_index}):"
         embed.description = best_match
         await ctx.send(embed=embed)
+
+    # Source command
+
+    @commands.command(name="source", aliases=("src",))
+    async def source_command(
+        self, ctx: commands.Context, *, source_item: SourceConverter = None
+    ) -> None:
+        """Display information and a GitHub link to the source code of a command, tag, or cog."""
+        if not source_item:
+            embed = Embed(title="Bot's GitHub Repository", color=0x00FFCC)
+            embed.add_field(
+                name="Repository",
+                value="[Go to GitHub](https://github.com/Py-Verse/PyBot)",
+            )
+            embed.set_thumbnail(url="https://avatars1.githubusercontent.com/u/9919")
+            await ctx.send(embed=embed)
+            return
+
+        embed = await self.build_embed(source_item)
+        await ctx.send(embed=embed)
+
+    def get_source_link(
+        self, source_item: SourceType
+    ) -> Tuple[str, str, Optional[int]]:
+        """
+        Build GitHub link of source item, return this link, file location and first line number.
+        Raise BadArgument if `source_item` is a dynamically-created object (e.g. via internal eval).
+        """
+        if isinstance(source_item, commands.Command):
+            src = source_item.callback.__code__
+            filename = src.co_filename
+        elif isinstance(source_item, str):
+            tags_cog = self.bot.get_cog("Tags")
+            filename = tags_cog._cache[source_item]["location"]
+        else:
+            src = type(source_item)
+            try:
+                filename = inspect.getsourcefile(src)
+            except TypeError:
+                raise commands.BadArgument(
+                    "Cannot get source for a dynamically-created object."
+                )
+
+        if not isinstance(source_item, str):
+            try:
+                lines, first_line_no = inspect.getsourcelines(src)
+            except OSError:
+                raise commands.BadArgument(
+                    "Cannot get source for a dynamically-created object."
+                )
+
+            lines_extension = f"#L{first_line_no}-L{first_line_no+len(lines)-1}"
+        else:
+            first_line_no = None
+            lines_extension = ""
+
+        # Handle tag file location differently than others to avoid errors in some cases
+        if not first_line_no:
+            file_location = Path(filename).relative_to("/bot/")
+        else:
+            file_location = Path(filename).relative_to(Path.cwd()).as_posix()
+
+        url = f"https://github.com/Py-Verse/PyBot/blob/master/{file_location}{lines_extension}"
+
+        return url, file_location, first_line_no or None
+
+    async def build_embed(self, source_object: SourceType) -> Optional[Embed]:
+        """Build embed based on source object."""
+        url, location, first_line = self.get_source_link(source_object)
+
+        if isinstance(source_object, commands.HelpCommand):
+            title = "Help Command"
+            description = source_object.__doc__.splitlines()[1]
+        elif isinstance(source_object, commands.Command):
+            description = source_object.short_doc
+            title = f"Command: {source_object.qualified_name}"
+        elif isinstance(source_object, str):
+            title = f"Tag: {source_object}"
+            description = ""
+        else:
+            title = f"Cog: {source_object.qualified_name}"
+            description = source_object.description.splitlines()[0]
+
+        embed = Embed(title=title, description=description, color=0x00FFCC)
+        embed.add_field(name="Source Code", value=f"[Go to GitHub]({url})")
+        line_text = f":{first_line}" if first_line else ""
+        embed.set_footer(text=f"{location}{line_text}")
+
+        return embed
+
+    # Levelling stuff
+
+    @commands.command(aliases=["xp", "r"])
+    async def rank(self, ctx, member: discord.Member = None):
+        """
+        Shows the rank of mentioned user / yours
+        """
+        if member is None:
+            member = ctx.author
+        else:
+            pass
+        stats = await levelling.find_one({"id": member.id})
+        if stats is None:
+            embed = discord.Embed(timestamp=ctx.message.created_at)
+
+            embed.set_author(name="You have not sent messages.")
+
+            await ctx.channel.send(embed=embed)
+
+        else:
+            xp = stats["xp"]
+            lvl = 0
+            rank = 0
+
+            while True:
+                if xp < ((50 * (lvl ** 2)) + (50 * (lvl))):
+                    break
+                lvl += 1
+            xp -= (50 * ((lvl - 1) ** 2)) + (50 * (lvl - 1))
+
+            rankings = levelling.find().sort("xp", -1)
+
+            async for x in rankings:
+                rank += 1
+                if stats["id"] == x["id"]:
+                    break
+
+            embed = discord.Embed(
+                timestamp=ctx.message.created_at,
+                title=f"{ctx.author.name}'s Level stats",
+                color=0xFF0000,
+            )
+            embed.add_field(name="Name", value=f"{member.mention}", inline=True)
+            embed.add_field(
+                name="XP", value=f"{xp}/{int(200* ((1/2)*lvl))}", inline=True
+            )
+            embed.add_field(name="Global Rank", value=f"{rank}", inline=True)
+            embed.add_field(name="Level", value=f"{lvl}", inline=True)
+            embed.set_thumbnail(url=member.avatar_url)
+            await ctx.channel.send(embed=embed)
+
+    @commands.command(
+        aliases=["db", "dashboard", "leaderboard"],
+        description="Shows server leaderboard",
+    )
+    async def lb(self, ctx):
+        """
+        Shows the members with highest xp
+        """
+        rankings = levelling.find().sort("xp", -1)
+        i = 1
+        embed = discord.Embed(
+            timestamp=ctx.message.created_at, title="Rankings", color=0xFF0000
+        )
+        async for x in rankings:
+            try:
+                temp = ctx.guild.get_member(x["id"])
+                tempxp = x["xp"]
+                embed.add_field(
+                    name=f"{i} : {temp.name}", value=f"XP: {tempxp}", inline=False
+                )
+                i += 1
+            except:
+                pass
+            if i == 11:
+                break
+
+        embed.set_footer(
+            text=f"Requested By: {ctx.author.name}", icon_url=f"{ctx.author.avatar_url}"
+        )
+
+        await ctx.channel.send(embed=embed)
 
 
 def setup(bot) -> None:

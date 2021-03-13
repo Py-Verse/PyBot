@@ -72,18 +72,18 @@ async def wsend(ctx):
     """
     e = discord.Embed(color=0x7289DA)
     e.add_field(
-        name="Reaction Roles\n\n",
+        name="Reaction Roles",
         value="**Operating System:**\n\n"
         "<:windows:819940534751199252> Windows\n\n"
-        "<:linux:819940542283644988> Linux\n\n"
+        "<:linux:819940542283644988> Linux/ Unix\n\n"
         "**Notification Roles:**\n\n"
-        "<:announcement:819958031047196692> Announcement\n\n"
+        "<:announcement:820155872914833459> Announcement\n\n"
         "<:chat_revive:820145356209389590> Chat Revive",
     )
     msg = await ctx.send(embed=e)
     await msg.add_reaction(f"<:windows:819940534751199252>")
     await msg.add_reaction(f"<:linux:819940542283644988>")
-    await msg.add_reaction(f"<:announcement:819958031047196692>")
+    await msg.add_reaction(f"<:announcement:820155872914833459>")
     await msg.add_reaction(f"<:chat_revive:820145356209389590>")
 
 
