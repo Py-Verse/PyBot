@@ -1,7 +1,3 @@
-import os
-from datetime import datetime
-
-import discord
 from discord.ext import commands
 
 
@@ -15,7 +11,7 @@ class ReactionRoles(commands.Cog):
 
     @commands.Cog.listener()
     async def on_ready(self):
-        print("Reaction role Cog Loaded Succesfully")
+        print("Reaction role Cog Loaded Successfully")
 
     @commands.Cog.listener()
     async def on_raw_reaction_add(self, payload):

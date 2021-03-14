@@ -1,7 +1,6 @@
 import asyncio
 
 import discord
-import requests
 from discord.ext import commands
 from discord.ext.commands import BucketType, cooldown
 
@@ -34,7 +33,7 @@ class General(commands.Cog):
         )
         embed.add_field(name="Suggestion", value=msg)
         embed.set_footer(
-            text=f"Wait until your suggestion is approved",
+            text="Wait until your suggestion is approved",
             icon_url=f"{ctx.author.avatar_url}",
         )
         message = await channel_only.send(embed=embed)
@@ -64,7 +63,7 @@ class General(commands.Cog):
 
         for i in range(20):
             messages.append(
-                await ctx.send(f"Say poll option or cancel to publish poll.")
+                await ctx.send("Say poll option or cancel to publish poll.")
             )
 
             try:
@@ -74,14 +73,14 @@ class General(commands.Cog):
 
             messages.append(entry)
 
-            if entry.clean_content.startswith(f"cancel"):
+            if entry.clean_content.startswith("cancel"):
                 break
 
             answers.append((to_emoji(i), entry.clean_content))
 
         try:
             await ctx.channel.delete_messages(messages)
-        except:
+        except Exception:
             pass  # oh well
         answer = "\n".join(f"{keycap}: {content}" for keycap, content in answers)
         e = discord.Embed(title=f"{ctx.author.name} asks: {question}", color=0x7289DA)

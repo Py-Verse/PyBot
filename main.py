@@ -1,69 +1,59 @@
-import os
-from datetime import datetime
+from datetime import datetime, timedelta
+from os import environ, listdir, system
 
+import aiohttp
 import discord
+
+# import uvloop
 from discord.ext import commands
 from pretty_help import PrettyHelp
 
-start_time = datetime.utcnow()
+# asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
+system("clear")
 
 
-description = """
-PyBot - A Bot for PyBot
-"""
-bot = commands.Bot(
-    command_prefix=["!", ">", "."],
-    owner_ids={747451011484090479, 727365670395838626},
-    intents=discord.Intents.all(),
-    help_command=PrettyHelp(),
-    description=description,
-    case_insensitive=True,
-    start_time=start_time,
-)
+class PyBot(commands.Bot):
+    def __init__(self):
+        self.description = """
+        PyBot - A Custom Bot for PyVerse Discord Server!
+        """
+
+        super().__init__(
+            command_prefix={"!", ">", "."},
+            owner_ids={747451011484090479, 727365670395838626},
+            intents=discord.Intents.all(),
+            help_command=PrettyHelp(),
+            description=self.description,
+            case_insensitive=True,
+            start_time=datetime.utcnow(),
+        )
+
+    async def on_connnect(self):
+        self.session = aiohttp.ClientSession(loop=self.loop)
+
+        cT = datetime.now() + timedelta(
+            hours=5, minutes=30
+        )  # GMT+05:30 is Our TimeZone So.
+
+        print(
+            f"[ Log ] {self.user} Connected at {cT.hour}:{cT.minute}:{cT.second} / {cT.day}-{cT.month}-{cT.year}"
+        )
+
+    async def on_ready(self):
+        cT = datetime.now() + timedelta(
+            hours=5, minutes=30
+        )  # GMT+05:30 is Our TimeZone So.
+
+        print(
+            f"[ Log ] {self.user} Ready at {cT.hour}:{cT.minute}:{cT.second} / {cT.day}-{cT.month}-{cT.year}"
+        )
+        print(f"[ Log ] GateWay WebSocket Latency: {self.latency*1000:.1f} ms")
 
 
-@bot.event
-async def on_ready():
-    print("Bot is ready")
+TOKEN = environ.get("TOKEN")
+bot = PyBot()
 
-
-"""
-Commands related to cog
-"""
-admins = [747451011484090479, 727365670395838626]
-
-
-@bot.command(hidden=True, description="Load cog")
-async def load(ctx, extension):
-    """
-    Load cog
-    """
-    if ctx.author.id not in admins:
-        bot.load_extension(f"cogs.{extension}")
-        await ctx.send("Done")
-
-
-@bot.command(hidden=True, description="Unload cog")
-async def unload(ctx, extension):
-    """
-    Unload Cog
-    """
-    if ctx.author.id not in admins:
-        bot.unload_extension(f"cogs.{extension}")
-        await ctx.send("Done")
-
-
-@bot.command(hidden=True, description="Reload cog")
-async def reload(ctx, extension):
-    """
-    Reload Cog
-    """
-    if ctx.author.id not in admins:
-        bot.unload_extension(f"cogs.{extension}")
-        bot.load_extension(f"cogs.{extension}")
-        await ctx.send("Done")
-
-
+# Reaction embed
 @bot.command(hidden=True)
 @commands.is_owner()
 async def wsend(ctx):
@@ -81,10 +71,10 @@ async def wsend(ctx):
         "<:chat_revive:820145356209389590> Chat Revive",
     )
     msg = await ctx.send(embed=e)
-    await msg.add_reaction(f"<:windows:819940534751199252>")
-    await msg.add_reaction(f"<:linux:819940542283644988>")
-    await msg.add_reaction(f"<:announcement:820155872914833459>")
-    await msg.add_reaction(f"<:chat_revive:820145356209389590>")
+    await msg.add_reaction("<:windows:819940534751199252>")
+    await msg.add_reaction("<:linux:819940542283644988>")
+    await msg.add_reaction("<:announcement:820155872914833459>")
+    await msg.add_reaction("<:chat_revive:820145356209389590>")
 
 
 # Verification embed
@@ -98,20 +88,14 @@ async def wsend2(ctx):
         "to get access to rest of the channels",
     )
     msg = await ctx.send(embed=e)
-    await msg.add_reaction(f"<:yes:820156388130160670>")
+    await msg.add_reaction("<:yes:820156388130160670>")
 
 
-"""
-Loads cog
-"""
-for filename in os.listdir("./cogs"):
-    if filename.endswith(".py"):
-        bot.load_extension(f"cogs.{filename[:-3]}")
+[
+    bot.load_extension(f"cogs.{file[:-3]}")
+    for file in listdir("./cogs")
+    if file.endswith(".py")
+]
 
 bot.load_extension("jishaku")
-
-
-token = os.environ.get("TOKEN")
-
-
-bot.run(f"{token}")
+bot.loop.run_until_complete(bot.run(TOKEN))

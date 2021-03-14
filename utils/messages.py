@@ -1,10 +1,7 @@
-import asyncio
-import contextlib
-import logging
 import random
 import re
 from io import BytesIO
-from typing import List, Optional, Sequence, Union
+from typing import List, Optional, Union
 
 import discord
 from discord.errors import HTTPException

@@ -1,30 +1,9 @@
-import difflib
-import logging
 import os
-import re
-import socket
-import unicodedata
-from datetime import datetime
-from typing import Tuple, Union
 
 import aiohttp
-import aioping
 import discord
-import pyspeedtest
-import requests
-import speedtest
-from discord import AsyncWebhookAdapter, Colour, Embed, Webhook, utils
+from discord import AsyncWebhookAdapter, Webhook
 from discord.ext import commands
-from discord.ext.commands import (
-    BadArgument,
-    BucketType,
-    Cog,
-    Context,
-    clean_content,
-    command,
-    cooldown,
-    has_any_role,
-)
 
 url = os.environ.get("logs")
 colors = [""]
@@ -75,7 +54,8 @@ class PyEvents(commands.Cog):
                     e = discord.Embed()
                     e.add_field(
                         name=f"Changes by - {after.author.name} ({after.author.id})",
-                        value=f"From -> {before.content}\n to -> {after.content}\n**[Message link]({after.jump_url})**  | {after.channel.mention} | {after.author.mention}",
+                        value=f"From -> {before.content}\n to -> {after.content}\n**[Message link]({after.jump_url})**  |"
+                        " {after.channel.mention} | {after.author.mention}",
                         inline=False,
                     )
                     e.set_author(name="Log", icon_url=after.author.avatar_url)
@@ -119,7 +99,7 @@ class PyEvents(commands.Cog):
             async with aiohttp.ClientSession() as session:
                 webhook = Webhook.from_url(url, adapter=AsyncWebhookAdapter(session))
                 e = discord.Embed()
-                e.add_field(name="\u200b", value=f"Invite deleted", inline=False)
+                e.add_field(name="\u200b", value="Invite deleted", inline=False)
                 e.set_author(name="Log", icon_url="https://i.imgur.com/fXUI76n.png")
                 e.set_footer(text="PyBot Logging")
                 await webhook.send(embed=e)
@@ -164,7 +144,7 @@ class PyEvents(commands.Cog):
                 webhook = Webhook.from_url(url, adapter=AsyncWebhookAdapter(session))
                 e = discord.Embed()
                 e.add_field(
-                    name=f"Message Deleted in Bulk",
+                    name="Message Deleted in Bulk",
                     value=f"{len(messages)} got deleted in {messages[0].channel.mention}",
                     inline=False,
                 )

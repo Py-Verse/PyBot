@@ -1,4 +1,3 @@
-import logging
 import re
 import typing as t
 from datetime import datetime
@@ -12,7 +11,6 @@ from aiohttp import ClientConnectorError
 from dateutil.relativedelta import relativedelta
 from discord.ext.commands import (
     BadArgument,
-    Bot,
     Context,
     Converter,
     IDConverter,

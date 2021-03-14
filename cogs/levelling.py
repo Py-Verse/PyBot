@@ -5,7 +5,7 @@ import motor.motor_asyncio
 import nest_asyncio
 from discord.ext import commands
 
-nest_asyncio.apply()
+# nest_asyncio.apply()
 
 mongo_url = os.environ.get("mongo")
 

@@ -1,9 +1,7 @@
 import difflib
 import inspect
-import logging
 import os
 import re
-import socket
 import unicodedata
 from datetime import datetime
 from pathlib import Path
@@ -12,20 +10,9 @@ from typing import Optional, Tuple, Union
 import discord
 import motor.motor_asyncio
 import nest_asyncio
-import requests
 from discord import Colour, Embed, utils
 from discord.ext import commands
-from discord.ext.commands import (
-    BadArgument,
-    BucketType,
-    Cog,
-    Context,
-    clean_content,
-    command,
-    cooldown,
-    has_any_role,
-)
-from discord.utils import snowflake_time
+from discord.ext.commands import BadArgument, Context
 
 from utils.messages import send_denial
 from utils.paginator import LinePaginator
@@ -49,8 +36,6 @@ SourceType = Union[
 DESCRIPTIONS = ("Command processing time", "Discord API latency")
 ROUND_LATENCY = 3
 
-import aiohttp
-from discord import AsyncWebhookAdapter, Webhook
 
 ZEN_OF_PYTHON = """\
 Beautiful is better than ugly.
@@ -114,16 +99,7 @@ class Info(commands.Cog):
 
     @commands.Cog.listener()
     async def on_ready(self):
-        print("Info Cog Loaded Succesfully")
-
-    @commands.command()
-    async def bot(sef, ctx):
-        """
-        Shows info about bot
-        """
-        e = discord.Embed(color=0x00FFCC)
-        e.set_author(name="Bot statistics", icon_url=ctx.author.avatar_url)
-        e.add_field()
+        print("Info Cog Loaded Successfully")
 
     @commands.command()
     async def ping(self, ctx: commands.Context) -> None:
@@ -429,8 +405,8 @@ class Info(commands.Cog):
                     name=f"{i} : {temp.name}", value=f"XP: {tempxp}", inline=False
                 )
                 i += 1
-            except:
-                pass
+            except Exception as e:
+                print(e)
             if i == 11:
                 break
 

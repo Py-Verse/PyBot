@@ -140,7 +140,7 @@ class Snekbox(commands.Cog):
             if len(output) >= 1000:
                 output = f"{output[:1000]}\n... (truncated - output too long, and contains too many lines)"
             else:
-                output = f"{output}\n... (truncated - output containts too many lines)"
+                output = f"{output}\n... (truncated - output contains too many lines)"
         elif len(output) >= 1000:
             truncated = True
             output = f"{output[:1000]}\n... (output capped - output too long)"

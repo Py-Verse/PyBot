@@ -15,7 +15,7 @@ class Moderation(commands.Cog):
 
     @commands.Cog.listener()
     async def on_ready(self):
-        print("Mod Cog Loaded Succesfully")
+        print("Mod Cog Loaded Successfully")
 
     @commands.command(description="Bans a member")
     @commands.has_permissions(ban_members=True)
@@ -83,7 +83,7 @@ class Moderation(commands.Cog):
         """
         guild = ctx.guild
         if member == self.bot.user:
-            await ctx.send("**Invaid**")
+            await ctx.send("**Invalid**")
         elif guild.me.top_role < member.top_role:
             await ctx.send("**Member is higher than me in hierarchy**")
         elif member == ctx.author:

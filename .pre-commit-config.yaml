@@ -9,7 +9,7 @@ repos:
       - id: trailing-whitespace
         exclude: |
           (?x)^(
-            data_structures/heap/binomial_heap.py
+            cogs/snekbox.py
           )$
       - id: requirements-txt-fixer
   - repo: https://github.com/psf/black
@@ -22,3 +22,24 @@ repos:
       - id: isort
         args:
           - --profile=black
+#  - repo: https://gitlab.com/pycqa/flake8
+#    rev: 3.8.3
+#    hooks:
+#      - id: flake8
+#        args:
+#          - --ignore=E203,W503,E302
+#          - --max-complexity=25
+#          - --max-line-length=150
+  - repo: https://github.com/codespell-project/codespell
+    rev: v1.17.1
+    hooks:
+      - id: codespell
+        args:
+          - --ignore-words-list=ans,fo,followings,hist,iff,mater,secant,som,tim
+          - --quiet-level=2
+        exclude: |
+          (?x)^(
+              other/dictionary.txt |
+              other/words |
+              project_euler/problem_022/p022_names.txt
+          )$
